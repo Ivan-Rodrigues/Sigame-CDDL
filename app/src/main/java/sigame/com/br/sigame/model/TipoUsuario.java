@@ -10,6 +10,12 @@ public class TipoUsuario implements Serializable {
 
     private String nome;
 
+    public TipoUsuario(Long id) {
+        this.id = id;
+    }
+
+    public TipoUsuario() {
+    }
 
     public Long getId() {
         return id;

@@ -1,13 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".activitys.CadastroUsuarioActivity">
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fillViewport="true">
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" android:background="#fff">
 
 
 
+        <!-- Registro Form -->
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            >
 
 
-</android.support.constraint.ConstraintLayout>
+
+            <android.support.design.widget.TextInputLayout
+                style="@style/MatchWrapStyle"
+                android:layout_marginBottom="8dp"
+                >
+                <EditText
+                    android:inputType="textPersonName"
+                    style="@style/MatchWrapStyle"
+                    android:id="@+id/edtNome"
+                    android:textColorHint="@color/white"
+                    android:hint="Nome"
+                    />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                style="@style/MatchWrapStyle"
+                android:id="@+id/txtInputTelefone"
+                >
+                <EditText
+                    android:inputType="number"
+                    style="@style/MatchWrapStyle"
+                    android:id="@+id/edtTelefone"
+                    android:hint="Telefone"
+                    />
+            </android.support.design.widget.TextInputLayout>
+
+
+            <android.support.design.widget.TextInputLayout
+                style="@style/MatchWrapStyle"
+                android:id="@+id/txtInputEmail"
+                >
+                <EditText
+                    android:inputType="textEmailAddress"
+                    style="@style/MatchWrapStyle"
+                    android:id="@+id/edtEmail"
+                    android:hint="Email"
+                    />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                style="@style/MatchWrapStyle"
+                android:id="@+id/textInputSenha"
+                android:layout_marginBottom="8dp"
+                >
+                <EditText
+                    style="@style/MatchWrapStyle"
+                    android:id="@+id/edtSenha"
+                    android:inputType="textPassword"
+                    android:textColorHint="@color/white"
+                    android:hint="Senha"
+                    />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                style="@style/MatchWrapStyle"
+                android:id="@+id/textInputConfirmaSenha"
+                >
+                <EditText
+                    style="@style/MatchWrapStyle"
+                    android:id="@+id/edtConfirmaSenha"
+                    android:inputType="textPassword"
+                    android:hint="Comfirme a senha"
+                    />
+            </android.support.design.widget.TextInputLayout>
+            <!-- Register Button -->
+            <Button android:id="@+id/btnRegistrar"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dip"
+                android:text="Cadastrar"/>
+            <!-- Link to Login Screen -->
+            <TextView android:id="@+id/link_to_login"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dip"
+                android:layout_marginBottom="40dip"
+                android:text="Já possui conta? Login aqui"
+                android:gravity="center"
+                android:textSize="20dip"
+                android:textColor="#025f7c"/>
+
+        </LinearLayout>
+        <!-- Registration Form Ends -->
+
+
+    </RelativeLayout>
+</ScrollView>

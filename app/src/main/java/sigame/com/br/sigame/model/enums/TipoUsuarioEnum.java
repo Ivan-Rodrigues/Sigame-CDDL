@@ -1,13 +1,13 @@
-package sigame.com.br.sigame.model;
+package sigame.com.br.sigame.model.enums;
 
-public enum Teste {
+public enum TipoUsuarioEnum {
 
     ADMINISTRADOR(1L),
     PEDESTRE(2L);
 
     private Long value;
 
-    Teste(Long value) {
+    TipoUsuarioEnum(Long value) {
         this.value = value;
     }
 

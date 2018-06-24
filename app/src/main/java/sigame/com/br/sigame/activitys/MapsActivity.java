@@ -34,6 +34,9 @@ import br.ufma.lsdi.cddl.type.CDDLConfig;
 import br.ufma.lsdi.cddl.type.ClientId;
 import br.ufma.lsdi.cddl.type.Host;
 import br.ufma.lsdi.cddl.type.Topic;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Response;
 import sigame.com.br.sigame.R;
@@ -43,7 +46,10 @@ import sigame.com.br.sigame.retrofit.RetrofitInicializador;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
-    private TextView txt_msg_robot;
+
+    @BindView(R.id.txt_msg_robot)
+    public TextView txt_msg_robot;
+
     private Marker marker;
     private String queryId;
     List<String> sensorList;
@@ -64,9 +70,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        ButterKnife.bind(this);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        txt_msg_robot = findViewById(R.id.txt_msg_robot);
+
         mapFragment.getMapAsync(this);
 
 
