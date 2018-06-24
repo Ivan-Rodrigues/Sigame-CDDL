@@ -1,6 +1,7 @@
 package sigame.com.br.sigame.activitys;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -40,6 +41,7 @@ import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Response;
 import sigame.com.br.sigame.R;
+import sigame.com.br.sigame.model.Localizacao;
 import sigame.com.br.sigame.model.TipoUsuario;
 import sigame.com.br.sigame.retrofit.RetrofitInicializador;
 
@@ -52,17 +54,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private Marker marker;
     private String queryId;
-    List<String> sensorList;
-    private List<TipoUsuario> tipoUsuarios;
 
-    private final CDDL cddl = CDDL.getInstance();
-
-    private final String clientId = "ivan.rodrigues@lsdi.ufma.br";
-
-    private Subscriber sub;
-
-    private Publisher pub;
-
+    private Localizacao localizacao;
 
 
     @Override
@@ -76,32 +69,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mapFragment.getMapAsync(this);
 
-
-        //iniciar CDDL
-        iniciarCDDL(this);
-
-        //mostrando sensores internos
-        mostrarSensores();
-
-
-        //publicar dado de contexto
-        //publisherContext(new ContextMessage("String","location","São Luis"));
-
-        //subscrever tópico
-        subscrever("ivan.rodrigues@lsdi.ufma.br/Location");
-
-
-        //iniciar sensores
-        sensorList = Arrays.asList("BMI160 Accelerometer","Location");
-        startSensores(sensorList);
-
-
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        configMap();
+
+        Intent intent = new Intent();
+        if (getIntent() != null) {
+            intent = getIntent();
+            Bundle bundle = new Bundle();
+            bundle = intent.getExtras();
+            localizacao = new Localizacao();
+            localizacao = (Localizacao) bundle.getSerializable("localizacao");
+            if (localizacao.getLatitude() == null) {
+
+                localizacao.setLatitude(-2.557505);
+                localizacao.setLongitude(-44.307923);
+
+            }
+            configMap(localizacao);
+
+        }
     }
 
 
@@ -110,37 +99,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onResume();
     }
 
-    private void getTipoUsuario() throws Exception{
 
-        tipoUsuarios = new ArrayList<TipoUsuario>();
-
-        try {
-            Call<List<TipoUsuario>> call = new RetrofitInicializador().getTipoUsuario().getTipoUsuario();
-            call.enqueue(new retrofit2.Callback<List<TipoUsuario>>() {
-                @Override
-                public void onResponse(Call<List<TipoUsuario>> call, Response<List<TipoUsuario>> response) {
-                    if (response.body() != null){
-                        tipoUsuarios.addAll(response.body());
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<List<TipoUsuario>> call, Throwable t) {
-
-                }
-            });
-        }catch (Exception e){
-
-        }
-
-    }
-
-
-    public void configMap(){
+    public void configMap(Localizacao localizacao) {
 
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         //map.getUiSettings().setScrollGesturesEnabled(false);
-         LatLng latLng = new LatLng(-2.557505, -44.307923);
+        LatLng latLng = new LatLng(-2.557505, -44.307923);
         // atualizar posição da camera
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(latLng).zoom(19).tilt(45).build();
@@ -148,15 +112,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //move camera
         mMap.moveCamera(update);
 
-        addMarker(latLng,"User","Location",R.drawable.user_location);
+        addMarker(latLng, "User", "Location", R.drawable.user_location);
 
 
     }
 
     //atualiar posição
-    private void updatePosition(LatLng latLng){
+    private void updatePosition(LatLng latLng) {
         //map.animateCamera(CameraUpdateFactory.newLatLng( latLng ));
-        marker.setPosition( latLng );
+        marker.setPosition(latLng);
     }
 
 
@@ -167,132 +131,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return markerr;
     }
 
-
-    //iniciando CDDL
-    public void iniciarCDDL(Context context) {
-
-        CDDLConfig config = CDDLConfig.builder()
-                .host(Host.of("tcp://lsdi.ufma.br:1883"))
-                .clientId(ClientId.of(clientId))
-                .build();
-
-        cddl.init(context, config);
-        cddl.startScan();
-
-    }
-
-
-    //subscreve em um topico
-    public void subscrever(String topic) {
-        sub = Subscriber.of(cddl);
-
-        sub.setCallback(new Callback() {
-            @Override
-            public void messageArrived(ContextMessage contextMessage) {
-                Gson gson = new Gson();
-                Log.d("subscriber", gson.toJson(contextMessage));
-
-
-            }
-
-            @Override
-            public void onConnectSuccess() {
-                sub.subscribe(Topic.of(topic));
-                Log.d("subscriber", "Conectado com sucesso");
-            }
-
-            @Override
-            public void onConnectFailure(Throwable exception) {
-                Log.d("subscriber", "Falha ao Conectar");
-            }
-
-            @Override
-            public void onSubscribeSuccess(Topic topic) {
-                Log.d("subscriber", "Subscrito com sucesso");
-            }
-
-            @Override
-            public void onSubscribeFailure(Throwable cause) {
-                Log.d("subscriber", "Falha ao Subscrever");
-            }
-        });
-        sub.connect();
-    }
-
-
-    //publica em um tópico
-    private void publisherContext(ContextMessage msg) {
-        // ContextMessage contextMessage = new ContextMessage("String", "User Action", "Walking");
-
-        pub = Publisher.of(cddl);
-        pub.setCallback(new Callback() {
-            @Override
-            public void onPublishFailure(Throwable cause) {
-                // publicado com sucesso
-            }
-
-            @Override
-            public void onConnectSuccess() {
-                pub.publish(msg);
-            }
-
-            @Override
-            public void onConnectFailure(Throwable exception) {
-                //falha na conexão
-            }
-        });
-        pub.connect();
-    }
-
-
-    private void mostrarSensores(){
-        List<String> sensors = cddl.getInternalSensorList();
-
-        for (String sen : sensors) {
-            Log.d("Sensors", sen);
-        }
-    }
-
-
-    //publica em um tópico
-    private void startSensores(List<String> sensorList) {
-
-        CommandRequest comandRequest = new CommandRequest(clientId,
-                new MOUUID(TechnologyID.INTERNAL.id, "localhost"),
-                "start-sensors", sensorList);
-
-        pub = Publisher.of(cddl);
-        pub.setCallback(new Callback() {
-            @Override
-            public void onPublishFailure(Throwable cause) {
-                Log.d("PUBLISHER", "Falha ao publicar");
-            }
-
-            @Override
-            public void onConnectSuccess() {
-                pub.publish(comandRequest);
-                Log.d("PUBLISHER", "publicado");
-            }
-
-            @Override
-            public void onConnectFailure(Throwable exception) {
-                Log.d("PUBLISHER", "Falha ao conectar");
-            }
-        });
-        pub.connect();
-    }
-
-
-
-
-
-
-    @Override
-    protected void onDestroy() {
-        if (cddl != null) cddl.stopScan();
-        if (pub != null) pub.disconnect();
-        if (sub != null) sub.disconnect();
-        super.onDestroy();
-    }
 
 }

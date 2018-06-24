@@ -1,14 +1,19 @@
 package sigame.com.br.sigame.activitys;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.support.multidex.MultiDex;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,6 +28,7 @@ import sigame.com.br.sigame.model.Usuario;
 import sigame.com.br.sigame.model.enums.TipoUsuarioEnum;
 import sigame.com.br.sigame.retrofit.RetrofitInicializador;
 import sigame.com.br.sigame.utils.Criptografia;
+import sigame.com.br.sigame.utils.PermissionUtils;
 
 public class CadastroUsuarioActivity extends AppCompatActivity {
 
@@ -52,7 +58,33 @@ public class CadastroUsuarioActivity extends AppCompatActivity {
         setContentView(R.layout.activity_cadastro_usuario);
         ButterKnife.bind(this);
 
+        MultiDex.install(this);
         preferencies();
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        for (int result : grantResults) {
+            if (result == PackageManager.PERMISSION_DENIED) {
+                return;
+            }
+        }
+        // startActivity(new Intent(this, MapsActivity.class));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Solicita as permissÃµes
+        String[] permissoes = new String[]{
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+        };
+
+        boolean teste = PermissionUtils.validate(this, 0, permissoes);
 
     }
 
@@ -94,6 +126,9 @@ public class CadastroUsuarioActivity extends AppCompatActivity {
 
 
         try{
+            Gson gson = new Gson();
+
+            Log.d("obj", gson.toJson(usuario));
             Call<Usuario> call = new RetrofitInicializador().salvarUsuario().salvarUsuario(usuario);
             call.enqueue(new Callback<Usuario>() {
                 @Override
@@ -126,7 +161,7 @@ public class CadastroUsuarioActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<Usuario> call, Throwable t) {
-
+                    t.printStackTrace();
                 }
             });
 
@@ -142,7 +177,7 @@ public class CadastroUsuarioActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(PREFS_PRIVATE, Context.MODE_PRIVATE);
         isLoggedIn = sharedPreferences.getBoolean("IsLoggedIn", false);
         if (isLoggedIn) {
-            Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
             startActivity(intent);
             finish();
         }
