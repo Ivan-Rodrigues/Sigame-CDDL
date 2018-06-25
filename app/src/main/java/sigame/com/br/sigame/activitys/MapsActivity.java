@@ -82,15 +82,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             bundle = intent.getExtras();
             localizacao = new Localizacao();
             localizacao = (Localizacao) bundle.getSerializable("localizacao");
-            if (localizacao.getLatitude() == null) {
-
+            if (localizacao == null) {
+                localizacao = new Localizacao();
                 localizacao.setLatitude(-2.557505);
                 localizacao.setLongitude(-44.307923);
 
             }
-            configMap(localizacao);
 
         }
+        configMap(localizacao);
     }
 
 
@@ -104,7 +104,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         //map.getUiSettings().setScrollGesturesEnabled(false);
-        LatLng latLng = new LatLng(-2.557505, -44.307923);
+        LatLng latLng = new LatLng(localizacao.getLatitude(), localizacao.getLongitude());
         // atualizar posição da camera
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(latLng).zoom(19).tilt(45).build();
@@ -119,7 +119,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //atualiar posição
     private void updatePosition(LatLng latLng) {
-        //map.animateCamera(CameraUpdateFactory.newLatLng( latLng ));
+        mMap.animateCamera(CameraUpdateFactory.newLatLng( latLng ));
         marker.setPosition(latLng);
     }
 

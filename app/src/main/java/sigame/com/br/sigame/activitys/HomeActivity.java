@@ -58,7 +58,14 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
 
+        localizacao = new Localizacao();
 
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         //iniciar CDDL
         iniciarCDDL(this);
 
@@ -76,8 +83,6 @@ public class HomeActivity extends AppCompatActivity {
         //iniciar sensores
         sensorList = Arrays.asList("BMI160 Accelerometer", "Location");
         startSensores(sensorList);
-
-
     }
 
     @OnClick(R.id.btnTrajeto)
@@ -85,6 +90,8 @@ public class HomeActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, MapsActivity.class);
         Bundle bundle = new Bundle();
+        localizacao.setLatitude(-2.5542354);
+        localizacao.setLongitude(-44.2467599);
         bundle.putSerializable("localizacao", localizacao);
         intent.putExtras(bundle);
         startActivity(intent);
@@ -120,12 +127,11 @@ public class HomeActivity extends AppCompatActivity {
                 Log.d("subscriber", gson.toJson(contextMessage));
 
 
-                String type = contextMessage.getType();
 //                if (type.equals(SensorData.class.getSimpleName())) {
-                    SensorData sensorData = gson.fromJson(contextMessage.getBody(), SensorData.class);
-                    localizacao.setLatitude(sensorData.getSensorValue()[0]);
-                    localizacao.setLongitude(sensorData.getSensorValue()[1]);
-                    localizacao.setData(new Date());
+                SensorData sensorData = gson.fromJson(contextMessage.getBody(), SensorData.class);
+                localizacao.setLatitude(sensorData.getSensorValue()[0]);
+                localizacao.setLongitude(sensorData.getSensorValue()[1]);
+                localizacao.setData(new Date());
 
 //                }
 
